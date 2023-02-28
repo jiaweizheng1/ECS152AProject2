@@ -1,44 +1,55 @@
-from socket import *    
+# Import socket module
+from socket import *
 
-webserverSocket = socket(AF_INET, SOCK_STREAM)
-webserverSocket.bind(("", 6789))
-webserverSocket.listen(1)
+# Create a TCP server socket
+#(AF_INET is used for IPv4 protocols)
+#(SOCK_STREAM is used for TCP)
 
+serverSocket = socket(AF_INET, SOCK_STREAM)
+
+serverip = '0.0.0.0'
+serverport = 6789
+serverSocket.bind((serverip, serverport))
+serverSocket.listen(1)
+
+# Server should be up and running and listening to the incoming connections
 while True:
-        print('Ready to serve...')
+	print('Ready to serve...')
+	
+	# Set up a new connection from the client
+	connectionSocket, addr = serverSocket.accept()
+	
+	# If an exception occurs during the execution of try clause
+	# the rest of the clause is skipped
+	# If the exception type matches the word after except
+	# the except clause is executed
+	try:
+		# Receives the request message from the client
+		message = connectionSocket.recv(1024).decode()
 
-        connectionSocket, addr = webserverSocket.accept()
+		# Extract the path of the requested object from the message
+		# The path is the second part of HTTP header, identified by [1]
+		filename = message.split()[1]
+		
+		# Because the extracted path of the HTTP request includes 
+		# a character '\', we read the path from the second character 
+		f = open(filename[1:],'rb')
 
-        try:
-                # update request with a loop
-                request = connectionSocket.recv(8192)
+		# Store the entire contenet of the requested file in a temporary buffer
+		outputdata = f.read()
+		# Send the HTTP response header line to the connection socket
+		connectionSocket.send('HTTP/1.0 200 OK\r\n\r\n'.encode()) 
+		# Send the content of the requested file to the connection socket
+		connectionSocket.send(outputdata)
+		connectionSocket.send("\r\n".encode())
+		# Close the client connection socket
+		f.close()
+		connectionSocket.close()
 
-                # Parse
-                first_line = request.split(b'\n')[0]
-                url = first_line.split()[1]
-
-                filename_pos = url.rfind(b'/')
-
-                filename = url[filename_pos + 1:]
-
-                connectionSocket.sendall("HTTP/1.1 200 OK\r\n\r\n".encode())
-
-                with open(filename, "rb") as file:
-                        while True:
-                                data = file.read(8192)
-                                if(len(data) > 0):
-                                        connectionSocket.sendall(data)
-                                else:
-                                        break
-
-
-                connectionSocket.sendall("\r\n".encode())
-
-                connectionSocket.close()
-        except IOError:
-                connectionSocket.sendall("HTTP/1.1 404 Not Found\r\n\r\n".encode())
-                connectionSocket.sendall("\r\n".encode())
-                
-                connectionSocket.close()
-
-webserverSocket.close()
+	except IOError:
+		# Send HTTP response message for file not found
+		connectionSocket.send('HTTP/1.0 404 Not Found\r\n'.encode())
+        
+		# Close the client connection socket
+		connectionSocket.close()
+serverSocket.close()
