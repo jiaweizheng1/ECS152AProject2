@@ -16,14 +16,11 @@ while True:
         first_line = request.split(b'\n')[0]
         url = first_line.split()[1]
 
-        http_pos = url.find(b'/')
-        temp = url[(http_pos + 1):]
+        port_pos = url.find(b':')
+        port_end_pos = url.rfind(b'/')
 
-        webserver_pos = temp.find(b'/')
-        port_pos = temp.find(b':')
-
-        webserver = temp[:port_pos]
-        port = int((temp[(port_pos + 1):])[:webserver_pos - port_pos - 1])
+        webserver = url[1:port_pos]
+        port = int(url[(port_pos + 1):port_end_pos])
                 
         webserverSocket = socket(AF_INET, SOCK_STREAM)
         webserverSocket.connect((webserver, port))
