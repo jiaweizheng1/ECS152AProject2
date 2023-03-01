@@ -1,7 +1,5 @@
 from socket import *
 
-define 
-
 webserverSocket = socket(AF_INET, SOCK_STREAM)
 webserverSocket.bind(("", 6789))
 webserverSocket.listen(1)
@@ -12,7 +10,7 @@ while True:
         connectionSocket, addr = webserverSocket.accept()
 
         try:
-                request = connectionSocket.recv(1048576)
+                request = connectionSocket.recv(8192)
 
                 first_line = request.split(b'\n')[0]
                 
@@ -22,18 +20,13 @@ while True:
 
                 filename = url[filename_pos + 1:]
 
-                data = []
-
-                data.append(b'HTTP/1.1 200 OK\r\n\r\n')
-
                 with open(filename, "rb") as file:
-                        data.append(file.read())
-
-                connectionSocket.sendall(b''.join(data))
+                        connectionSocket.sendall(b'HTTP/1.1 200 OK\r\n\r\n')
+                        connectionSocket.sendall(file.read())
 
                 connectionSocket.close()
                 
-        except:
+        except IOError:
                 connectionSocket.sendall(b'HTTP/1.1 404 Not Found\r\n\r\n')
         
                 connectionSocket.close()
