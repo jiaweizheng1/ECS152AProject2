@@ -15,21 +15,24 @@ while True:
                 first_line = request.split(b'\n')[0]
 
                 url = first_line.split()[1]
-
-                port_start_pos = url.find(b':')
         
                 port_end_pos = url.rfind(b'/')
-                        
-                webserver = url[1:port_start_pos]
-
-                port = int(url[port_start_pos+1:port_end_pos])
 
                 filename = url[port_end_pos+1:]
 
                 try:
-                        with open(filename, "rb") as file:
-                                connectionSocket.sendall(file.read())
+                        existingfile = open(filename, "rb")
+
+                        connectionSocket.sendall(existingfile.read())
+
+                        existingfile.close()
                 except IOError:
+                        port_start_pos = url.find(b':')
+                        
+                        webserver = url[1:port_start_pos]
+
+                        port = int(url[port_start_pos+1:port_end_pos])
+                        
                         webserverSocket = socket(AF_INET, SOCK_STREAM)
                         
                         webserverSocket.connect((webserver, port))
@@ -45,9 +48,13 @@ while True:
                                 data.append(data_buff)
 
                         data = b''.join(data)
-                        
-                        with open(filename, "wb") as file:
-                                file.write(data)
+
+                        if b'200 OK' in data:
+                                newfile = open(filename, "wb")
+
+                                newfile.write(data)
+
+                                newfile.close()
 
                         connectionSocket.sendall(data)
 

@@ -18,11 +18,15 @@ while True:
 
                 filename_pos = url.rfind(b'/')
 
-                filename = url[filename_pos + 1:]
+                filename = url[filename_pos+1:]
 
-                with open(filename, "rb") as file:
-                        connectionSocket.sendall(b'HTTP/1.1 200 OK\r\n\r\n')
-                        connectionSocket.sendall(file.read())
+                existingfile = open(filename, "rb")
+
+                connectionSocket.sendall(b'HTTP/1.1 200 OK\r\n\r\n')
+                
+                connectionSocket.sendall(existingfile.read())
+
+                existingfile.close()
 
                 connectionSocket.close()
                 
