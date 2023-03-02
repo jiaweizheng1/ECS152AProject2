@@ -23,10 +23,14 @@ while True:
                 try:
                         existingfile = open(filename, "rb")
 
+                        print("got " + filename.decode() + " from cache")
+
                         connectionSocket.sendall(existingfile.read())
 
                         existingfile.close()
                 except IOError:
+                        print("got " + filename.decode() + " from web server")
+                        
                         port_start_pos = url.find(b':')
                         
                         webserver = url[1:port_start_pos]

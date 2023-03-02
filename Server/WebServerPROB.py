@@ -30,7 +30,7 @@ while True:
 
                 connectionSocket.close()
                 
-        except IOError:
+        except:
                 connectionSocket.sendall(b'HTTP/1.1 404 Not Found\r\n\r\n')
         
                 connectionSocket.close()
