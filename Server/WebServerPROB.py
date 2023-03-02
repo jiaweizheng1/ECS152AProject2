@@ -1,4 +1,3 @@
-# Import socket module
 from socket import *
 
 # Create a TCP socket on port 6789 for web server
@@ -55,9 +54,6 @@ while True:
         except:
                 # Send HTTP response message for file not found
                 connectionSocket.sendall(b'HTTP/1.1 404 Not Found\r\n\r\n')
-
-                # send trailer
-                connectionSocket.sendall(b'\r\n')
 
                 # Close the client connection socket
                 connectionSocket.close()
