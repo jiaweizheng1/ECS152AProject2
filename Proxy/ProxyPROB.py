@@ -2,7 +2,7 @@ from socket import *
 
 # Create a TCP socket on port 8888 for proxy server
 proxyserverSocket = socket(AF_INET, SOCK_STREAM)
-proxyserverSocket.bind(("", 8888))
+proxyserverSocket.bind((gethostbyname(gethostname()), 8888))
 proxyserverSocket.listen(1)
 
 while True:
@@ -64,11 +64,10 @@ while True:
                         # encode data so each index contains only one character
                         data = b''.join(data)
 
-                        print("got " + filename.decode() + " from web server")
-
                         # If the data is valid, save in the cache
                         if b'200 OK' in data:
                                 newfile = open(filename, "wb")
+                                print("got " + filename.decode() + " from web server")
                                 newfile.write(data)
                                 newfile.close()
                                 

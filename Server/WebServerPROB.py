@@ -4,7 +4,7 @@ from socket import *
 #(AF_INET is used for IPv4 protocols)
 #(SOCK_STREAM is used for TCP)
 webserverSocket = socket(AF_INET, SOCK_STREAM)
-webserverSocket.bind(("", 6789))
+webserverSocket.bind((gethostbyname(gethostname()), 6789))
 webserverSocket.listen(1)
 
 # Server should be up and running and listening to the incoming connections
@@ -42,6 +42,8 @@ while True:
                 # Send the content of the requested file to the connection socket
                 connectionSocket.sendall(existingfile.read())
 
+                print("read from file " + filename.decode())
+
                 # send trailer
                 connectionSocket.sendall(b'\r\n')
 
@@ -54,6 +56,8 @@ while True:
         except:
                 # Send HTTP response message for file not found
                 connectionSocket.sendall(b'HTTP/1.1 404 Not Found\r\n\r\n')
+
+                print("dont have file " + filename.decode())
 
                 # Close the client connection socket
                 connectionSocket.close()
