@@ -57,8 +57,6 @@ while True:
                 # Send HTTP response message for file not found
                 connectionSocket.sendall(b'HTTP/1.1 404 Not Found\r\n\r\n')
 
-                print("dont have file " + filename.decode())
-
                 # Close the client connection socket
                 connectionSocket.close()
 
